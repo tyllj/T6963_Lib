@@ -3,8 +3,9 @@ r10-	see Revision.txt
 -----------------------------------------------------------------------------------------------*/
 #ifndef T6963_h
 #define T6963_h
+#define byte uint8_t
 
-#include "WProgram.h"
+//#include "WProgram.h"
 #include "inttypes.h"
 #include "avr/io.h"
 #include "avr/pgmspace.h"
@@ -115,7 +116,7 @@ public:
   void SetAddressPointer(unsigned int address);
   byte setMode(char, char);
   byte clearDispMode();
-  byte setDispMode(boolean _text,boolean _graphics, boolean _cursor, boolean _blink);
+  byte setDispMode(bool _text,bool _graphics, bool _cursor, bool _blink);
   byte setTextAttrMode(char);
   
   byte setCursorPattern(byte _b);

@@ -1,10 +1,17 @@
 /*-------------------------------------------------------------------------------------------------
 r10- 	see Revision.txt
 -----------------------------------------------------------------------------------------------*/
-#include "WProgram.h"
+//#include <WProgram.h>
 #include "T6963.h"
 #include <avr/pgmspace.h>
+#include "Arduino.h"
 //#include "T6963_Commands.h" - Removed in R9
+//-------------------------------------------------------------------------------------------------
+//
+// Constrain function
+//  
+//-------------------------------------------------------------------------------------------------
+#define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 //-------------------------------------------------------------------------------------------------
 //
 // Delay function
@@ -415,7 +422,7 @@ void T6963::writePixel(byte x, byte y, byte color){
 //-------------------------------------------------------------------------------------------------
 byte T6963::setPixel(byte x, byte y){
   SetAddressPointer((_GH + (x / _FW) + (_GA * y)));
-  byte tmp=B11111000;
+  byte tmp=0b11111000;
   tmp |= (_FW-1)-(x%_FW); //LSB Direction Correction
   writeCommand(tmp);
   return tmp;
@@ -425,7 +432,7 @@ byte T6963::setPixel(byte x, byte y){
 //-------------------------------------------------------------------------------------------------
 byte T6963::clearPixel(byte x, byte y){
   SetAddressPointer((_GH + (x / _FW) + (_GA * y)));
-  byte tmp=B11110000;
+  byte tmp=0b11110000;
   tmp |= (_FW-1)-(x%_FW); //LSB Direction Correction
   writeCommand(tmp);
   return tmp;
@@ -552,20 +559,20 @@ byte T6963::clearDispMode(){
 //								LCD.setCursorPattern(8); // Cursor high
 //								LCD.setCursorPointer(0,0); //Cursor Position	 
 //-----------------------------------------------------------------------
-byte T6963::setDispMode(boolean _text,boolean _graphics, boolean _cursor, boolean _blink)
+byte T6963::setDispMode(bool _text,bool _graphics, bool _cursor, bool _blink)
 {
   byte tmp=T6963_DISPLAY_MODE;
   if(_graphics){
-    tmp |= B1000; //T6963_GRAPHIC_DISPLAY_ON
+    tmp |= 0b1000; //T6963_GRAPHIC_DISPLAY_ON
   }
   if(_text){
-    tmp |= B0100; //T6963_TEXT_DISPLAY_ON
+    tmp |= 0b0100; //T6963_TEXT_DISPLAY_ON
   }
   if(_cursor){
-    tmp |= B0010; //T6963_CURSOR_DISPLAY_ON
+    tmp |= 0b0010; //T6963_CURSOR_DISPLAY_ON
   }
   if(_blink){
-    tmp |=B0001; //T6963_CURSOR_BLINK_ON
+    tmp |= 0b0001; //T6963_CURSOR_BLINK_ON
   }
   writeCommand(tmp);
   return tmp;
@@ -646,7 +653,7 @@ void T6963::createLine(int x0,int y0,int x1,int y1, byte color)
 /*BreshenhamLine algorithm - From wikipedia so it must be right
 http://en.wikipedia.org/wiki/Bresenham's_line_algorithm
 */
-  boolean steep = abs(y1 - y0) > abs(x1 - x0);
+  bool steep = abs(y1 - y0) > abs(x1 - x0);
   if(steep){
     //swap(x0, y0)
     //swap(x1, y1)
