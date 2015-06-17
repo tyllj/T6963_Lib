@@ -143,6 +143,8 @@ public:
   byte getTextCols();
   byte getFw(); //Fontwidth
    
+  byte checkHalf(byte in);
+
 private:
   void plot8points(int, int, int, int, byte);
   void plot4points(int, int, int, int, byte);

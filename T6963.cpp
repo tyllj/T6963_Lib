@@ -200,6 +200,7 @@ byte T6963::ReadData(void){
 //
 //-------------------------------------------------------------------------------------------------
 void T6963::SetAddressPointer(unsigned int address){
+  //address = checkHalf(address);
   writeData(address & 0xFF);
   writeData(address >> 8);
   writeCommand(T6963_SET_ADDRESS_POINTER);
@@ -871,4 +872,14 @@ byte T6963::setCursorPointer(byte _col,byte _row)
   writeData(_col);
   writeData(_row);
   writeCommand(0x21); //Cursor pointer Set
+}
+//-------------------------------------------------------------------------------------------------
+//
+// Correct adress for 2nd display half
+//
+//-------------------------------------------------------------------------------------------------
+byte T6963::checkHalf(byte in)
+{
+  if(in > 0x0FFF) return in + 0x8000;
+  else return in;
 }
