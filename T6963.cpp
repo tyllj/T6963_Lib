@@ -49,6 +49,10 @@ void T6963::setTH(unsigned int addr){
 unsigned int T6963::getTH(){
   return _TH;
 }
+//expose _TH for second half
+unsigned int T6963::getTH2(){
+  return setHalf(_TH);
+}
 //return _TH
 void T6963::setGH(unsigned int addr){
   if(addr == _TH){
@@ -60,6 +64,9 @@ void T6963::setGH(unsigned int addr){
 }
 unsigned int T6963::getGH(){
   return _GH;
+}
+unsigned int T6963::getGH2(){
+  return setHalf(_GH);
 }
 byte T6963::getTextRows(){
   return (GLCD_NUMBER_OF_LINES/8);
@@ -200,7 +207,7 @@ byte T6963::ReadData(void){
 //
 //-------------------------------------------------------------------------------------------------
 void T6963::SetAddressPointer(unsigned int address){
-  //address = checkHalf(address);
+  if (address > 0x0FFF) address = setHalf(address);
   writeData(address & 0xFF);
   writeData(address >> 8);
   writeCommand(T6963_SET_ADDRESS_POINTER);
@@ -215,6 +222,13 @@ void T6963::clearText(){
   for(int i = 0; i < sizeTA; i++){
     WriteDisplayData(0);
   }
+  if(doubleDisp)
+  {
+    SetAddressPointer(setHalf(_TH));
+    for(int i = 0; i < sizeTA; i++){
+      WriteDisplayData(0);
+    }
+  }
 }
 //-------------------------------------------------------------------------------------------------
 // Clears characters generator area of display RAM memory
@@ -225,6 +239,14 @@ void T6963::clearCG(){
   for(i = 0; i < 256 * 8; i++){
     WriteDisplayData(0);
   }
+  if(doubleDisp)
+  {
+    unsigned int i=setHalf(((_sizeMem/2)-1)*0x800);
+    SetAddressPointer(i);
+    for(i = 0; i < 256 * 8; i++){
+      WriteDisplayData(0);
+    } 
+  }
 }
 //-------------------------------------------------------------------------------------------------
 // Clears graphics area of display RAM memory
@@ -233,6 +255,13 @@ void T6963::clearGraphic(){
   SetAddressPointer(_GH);
   for(unsigned int i = 0; i < sizeGA; i++){
     WriteDisplayData(0x00);
+  }
+  if(doubleDisp)
+  {
+    SetAddressPointer(setHalf(_GH));
+    for(unsigned int i = 0; i < sizeGA; i++){
+      WriteDisplayData(0x00);
+    }
   }
 }
 //-------------------------------------------------------------------------------------------------
@@ -387,6 +416,12 @@ void T6963::WriteStringPgm(prog_char * string){
 void T6963::TextGoTo(unsigned char x, unsigned char y){
   unsigned int address;
   address = _TH +  x + (_TA * y);
+
+  if(doubleDisp & (y > GLCD_NUMBER_OF_LINES / _TA + 1))
+  { 
+    y -= GLCD_NUMBER_OF_LINES / _TA + 2;
+    address = setHalf(_TH) + x + (_TA * y);
+  }
   SetAddressPointer(address);
 }
 //-------------------------------------------------------------------------------------------------
@@ -406,7 +441,7 @@ void T6963::DefineCharacter(byte charCode, unsigned char * defChar){
 void T6963::writePixel(byte x, byte y, byte color){
   unsigned char tmp;
   unsigned int address;
-  address = _GH + (x / _FW) + (_GA * y);
+  address = addressFromXY(x, y);
   SetAddressPointer(address);
   writeCommand(T6963_DATA_READ_AND_NONVARIABLE);
   tmp = ReadData();
@@ -422,7 +457,7 @@ void T6963::writePixel(byte x, byte y, byte color){
 // Set a single pixel at x,y (in pixels) to 1 (on)
 //-------------------------------------------------------------------------------------------------
 byte T6963::setPixel(byte x, byte y){
-  SetAddressPointer((_GH + (x / _FW) + (_GA * y)));
+  SetAddressPointer(addressFromXY(x, y));
   byte tmp=0b11111000;
   tmp |= (_FW-1)-(x%_FW); //LSB Direction Correction
   writeCommand(tmp);
@@ -432,7 +467,7 @@ byte T6963::setPixel(byte x, byte y){
 // Set a single pixel at x,y (in pixels) to 0 (off)
 //-------------------------------------------------------------------------------------------------
 byte T6963::clearPixel(byte x, byte y){
-  SetAddressPointer((_GH + (x / _FW) + (_GA * y)));
+  SetAddressPointer(addressFromXY(x, y));
   byte tmp=0b11110000;
   tmp |= (_FW-1)-(x%_FW); //LSB Direction Correction
   writeCommand(tmp);
@@ -538,7 +573,7 @@ byte T6963::setTextAttrMode(char _mode){   // Text only: 0=Normal display 5=Reve
   else{
     tmp |= 0; //Normal Text mode default
   }
-   SetAddressPointer(_GH);
+    SetAddressPointer(_GH);
   for(unsigned int i = 0; i < sizeGA; i++){
     WriteDisplayData(tmp);    
   }
@@ -806,8 +841,10 @@ void T6963::plot4points(int cx, int cy, int x, int y, byte color)
 // Display initalization
 //
 //-------------------------------------------------------------------------------------------------
-void T6963::Initialize(void)
+void T6963::Initialize(bool doubleD)
 {
+  doubleDisp = doubleD;
+
   //Set up data and control ports
   InitalizeInterface();
 
@@ -875,11 +912,18 @@ byte T6963::setCursorPointer(byte _col,byte _row)
 }
 //-------------------------------------------------------------------------------------------------
 //
-// Correct adress for 2nd display half
+// Correct address for 2nd display half
 //
 //-------------------------------------------------------------------------------------------------
-byte T6963::checkHalf(byte in)
+unsigned int T6963::setHalf(unsigned int in)
 {
-  if(in > 0x0FFF) return in + 0x8000;
-  else return in;
+  return in | 0x8000;
 }
+
+unsigned int T6963::addressFromXY(int x, int y)
+{
+  unsigned int address = _GH + (x / _FW) + (_GA * y);
+  if (doubleDisp & (y > GLCD_NUMBER_OF_LINES/2)) address = setHalf(address) - _GA * GLCD_NUMBER_OF_LINES/2;
+  return address;
+}
+  

@@ -107,7 +107,7 @@ public:
   void TextGoTo(byte, byte);
   void GraphicGoTo(byte x, byte y);
   void DefineCharacter(unsigned char, unsigned char *);
-  void Initialize(void);
+  void Initialize(bool);
   void writePixel(byte, byte, byte);
   byte clearPixel(byte,byte);
   byte setPixel(byte,byte);
@@ -135,15 +135,18 @@ public:
   
   void setTH(unsigned int addr);
   unsigned int getTH();
+  unsigned int getTH2();
   void setGH(unsigned int addr);
   unsigned int getGH();
+  unsigned int getGH2();
   unsigned int sizeGA;	//(GLCD_GRAPHIC_AREA * GLCD_NUMBER_OF_LINES)
   unsigned int sizeTA;	//(GLCD_TEXT_AREA * (GLCD_NUMBER_OF_LINES/8))
   byte getTextRows();
   byte getTextCols();
   byte getFw(); //Fontwidth
    
-  byte checkHalf(byte in);
+  unsigned int setHalf(unsigned int in);
+  unsigned int addressFromXY(int x, int y);
 
 private:
   void plot8points(int, int, int, int, byte);
@@ -156,7 +159,7 @@ private:
   unsigned int _GA;		//(GLCD_PIXELS_PER_LINE / GLCD_FONT_WIDTH)
   unsigned int _TA;		//(GLCD_PIXELS_PER_LINE / GLCD_FONT_WIDTH)
   byte _sizeMem;  //memory location for CGRAM (2kb required, 64kb max memory controlled by T6963, 32 possible locations)
-
+  bool doubleDisp; // is it a double display?
 };
 
 
