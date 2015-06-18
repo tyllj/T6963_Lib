@@ -415,12 +415,14 @@ void T6963::WriteStringPgm(prog_char * string){
 //-------------------------------------------------------------------------------------------------
 void T6963::TextGoTo(unsigned char x, unsigned char y){
   unsigned int address;
-  address = _TH +  x + (_TA * y);
-
-  if(doubleDisp & (y > GLCD_NUMBER_OF_LINES / _TA + 1))
+  if(doubleDisp & (y > GLCD_NUMBER_OF_LINES / _TA + 1))   // bottom half
   { 
     y -= GLCD_NUMBER_OF_LINES / _TA + 2;
     address = setHalf(_TH) + x + (_TA * y);
+  }
+  else                                                    // top half
+  {
+    address = _TH +  x + (_TA * y);
   }
   SetAddressPointer(address);
 }
@@ -922,8 +924,19 @@ unsigned int T6963::setHalf(unsigned int in)
 
 unsigned int T6963::addressFromXY(int x, int y)
 {
-  unsigned int address = _GH + (x / _FW) + (_GA * y);
-  if (doubleDisp & (y > GLCD_NUMBER_OF_LINES/2)) address = setHalf(address) - _GA * GLCD_NUMBER_OF_LINES/2;
+  if (y > GLCD_NUMBER_OF_LINES | x > GLCD_PIXELS_PER_LINE) return _GH;
+  unsigned int address;
+  if (doubleDisp & (y > GLCD_NUMBER_OF_LINES/2)) 
+  {
+    //x -= 1;
+    y -= 1;
+    address = _GH + (x / _FW) + (_GA * y);
+    address = setHalf(address) - _GA * GLCD_NUMBER_OF_LINES/2;
+  }
+  else
+  {
+    address = _GH + (x / _FW) + (_GA * y);
+  }
   return address;
 }
   
