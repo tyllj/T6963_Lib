@@ -4,30 +4,36 @@ r10-	see Revision.txt
 #ifndef T6963_h
 #define T6963_h
 #define byte uint8_t
-
+#define prog_char char
+#define prog_uchar unsigned char
 //#include "WProgram.h"
 #include "inttypes.h"
 #include "avr/io.h"
 #include "avr/pgmspace.h"
 #include "util/delay.h"
 #include "font.h"
+#include "pins_arduino.h"
 
 //#include "T6963_Commands.h" - R9 removed
+
+
 
 #if (defined(__AVR_ATmega1280__) || \
      defined(__AVR_ATmega1281__) || \
      defined(__AVR_ATmega2560__) || \
-     defined(__AVR_ATmega2561__))      //--- Arduino Mega ---
+     defined(__AVR_ATmega2561__) || \
+     defined(__AVR_ATmega644__) || \
+     defined(__AVR_ATmega644P__))      //--- Arduino Mega ---
 
 // data port Arduino Mega
-#define GLCD_DATA_PORT	 	PORTL
-#define GLCD_DATA_PIN		PINL		//Arduino Mega Pins 49-42
-#define GLCD_DATA_DDR		DDRL
+#define GLCD_DATA_PORT	 	PORTC
+#define GLCD_DATA_PIN		PINC		//Arduino Mega Pins 49-42
+#define GLCD_DATA_DDR		DDRC
 
 // control port Arduino Mega
-#define GLCD_CTRL_PORT		PORTC
-#define GLCD_CTRL_PIN		PINC		//Arduino Mega Pins 37-34
-#define GLCD_CTRL_DDR		DDRC
+#define GLCD_CTRL_PORT		PORTD
+#define GLCD_CTRL_PIN		PIND		//Arduino Mega Pins 37-34
+#define GLCD_CTRL_DDR		DDRD
 # else
 // data port other Arduino
 #define GLCD_DATA_PORT1 	PORTD
@@ -50,12 +56,12 @@ r10-	see Revision.txt
 # endif
 
 // control signals
-#define GLCD_WR 		0
-#define GLCD_RD			1
-#define GLCD_CE			2  //Should be able to XNOR this with WR and RD
-#define GLCD_CD			3
-//#define GLCD_RESET  		4  //For some reason my LCD works with this pin resistored to +5
-//#define GLCD_FS     		5  //Use hardware solution not pin.
+#define GLCD_WR 		2
+#define GLCD_RD			3
+#define GLCD_CE			4  //Should be able to XNOR this with WR and RD
+#define GLCD_CD			5
+#define GLCD_RESET  	6  //For some reason my LCD works with this pin resistored to +5
+// #define GLCD_FS     	7  //Use hardware solution not pin.
 
 // display properties
 

@@ -86,7 +86,9 @@ void T6963::InitalizeInterface(void){
 #if (defined(__AVR_ATmega1280__) || \
      defined(__AVR_ATmega1281__) || \
      defined(__AVR_ATmega2560__) || \
-     defined(__AVR_ATmega2561__))      //--- Arduino Mega ---
+     defined(__AVR_ATmega2561__) || \
+defined(__AVR_ATmega644__) || \
+defined(__AVR_ATmega644P__))      //--- Arduino Mega ---
   GLCD_DATA_DDR = 0xFF;
 # else  //--- other Arduino ---
   GLCD_DATA_DDR1 |= GLCD_DATA_MASK1;
@@ -105,7 +107,9 @@ byte T6963::checkStatus(void){
 #if (defined(__AVR_ATmega1280__) || \
      defined(__AVR_ATmega1281__) || \
      defined(__AVR_ATmega2560__) || \
-     defined(__AVR_ATmega2561__))      //--- Arduino Mega ---
+     defined(__AVR_ATmega2561__) || \
+defined(__AVR_ATmega644__) || \
+defined(__AVR_ATmega644P__))      //--- Arduino Mega ---
   GLCD_DATA_DDR = 0x00;
   GLCD_CTRL_PORT &= ~((1 << GLCD_RD) | (1 << GLCD_CE));
   n_delay();
@@ -134,7 +138,9 @@ void T6963::writeCommand(byte command){
 #if (defined(__AVR_ATmega1280__) || \
      defined(__AVR_ATmega1281__) || \
      defined(__AVR_ATmega2560__) || \
-     defined(__AVR_ATmega2561__))      //--- Arduino Mega ---
+     defined(__AVR_ATmega2561__) || \
+defined(__AVR_ATmega644__) || \
+defined(__AVR_ATmega644P__))      //--- Arduino Mega ---
   
   GLCD_DATA_PORT = command;
 # else	//--- other Arduino ---
@@ -158,7 +164,9 @@ void T6963::writeData(byte data){
 #if (defined(__AVR_ATmega1280__) || \
      defined(__AVR_ATmega1281__) || \
      defined(__AVR_ATmega2560__) || \
-     defined(__AVR_ATmega2561__))      //--- Arduino Mega ---
+     defined(__AVR_ATmega2561__) || \
+defined(__AVR_ATmega644__) || \
+defined(__AVR_ATmega644P__))      //--- Arduino Mega ---
   GLCD_DATA_PORT = data;
 # else  //--- other Arduino ---  
   GLCD_DATA_PORT1 &= ~GLCD_DATA_MASK1;
@@ -181,7 +189,9 @@ byte T6963::ReadData(void){
 #if (defined(__AVR_ATmega1280__) || \
      defined(__AVR_ATmega1281__) || \
      defined(__AVR_ATmega2560__) || \
-     defined(__AVR_ATmega2561__))      //--- Arduino Mega ---
+     defined(__AVR_ATmega2561__) || \
+defined(__AVR_ATmega644__) || \
+defined(__AVR_ATmega644P__))      //--- Arduino Mega ---
   GLCD_DATA_DDR = 0x00;
   GLCD_CTRL_PORT &= ~((1 << GLCD_RD) | (1 << GLCD_CE) | (1 << GLCD_CD));
   n_delay();
@@ -851,9 +861,9 @@ void T6963::Initialize(bool doubleD)
   InitalizeInterface();
 
   //reset LCD, should be able to have hardware solution
-  //GLCD_CTRL_PORT &= ~(1 << GLCD_RESET);
-  //_delay_ms(1);
-  //GLCD_CTRL_PORT |= (1 << GLCD_RESET);
+  GLCD_CTRL_PORT &= ~(1 << GLCD_RESET);
+  _delay_ms(1);
+  GLCD_CTRL_PORT |= (1 << GLCD_RESET);
 
   //Set Graphics Home Address
   writeData(_GH & 0xFF);

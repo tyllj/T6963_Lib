@@ -33,7 +33,9 @@ void setup(){
   #if (defined(__AVR_ATmega1280__) || \
      defined(__AVR_ATmega1281__) || \
      defined(__AVR_ATmega2560__) || \
-     defined(__AVR_ATmega2561__))      //--- Arduino Mega ---
+     defined(__AVR_ATmega2561__) || \
+defined(__AVR_ATmega644__) || \
+defined(__AVR_ATmega644P__))      //--- Arduino Mega ---
   Serial.println("Arduino Mega");
   # else  //--- other Arduino ---
   Serial.println("not Arduino Mega");
