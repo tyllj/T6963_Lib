@@ -4,9 +4,9 @@ r10-	see Revision.txt
 #ifndef T6963_h
 #define T6963_h
 #define byte uint8_t
-#define prog_char char
-#define prog_uchar unsigned char
-//#include "WProgram.h"
+#define prog_char const char
+#define prog_uchar const unsigned char
+
 #include "inttypes.h"
 #include "avr/io.h"
 #include "avr/pgmspace.h"
